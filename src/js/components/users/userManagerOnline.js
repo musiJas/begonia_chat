@@ -3,11 +3,12 @@ import { connect } from 'react-redux'
 import UserLeftPanel  from './userLeftPanel' 
 import UserRightPanel from './userRightPanel'
 
+
+
 type props={
     route: RouteT,
     dispatch: Dispatch,
 }
-
 
 class UserManagerOnlinePage extends React.Component<props>{
 

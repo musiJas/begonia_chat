@@ -1,8 +1,9 @@
 import React,{createRef}  from 'react'
 import { connect } from 'react-redux'
-import { toLogin } from '../utils/https'
+// import { toLogin } from '../utils/httpClient'
 import loginModule from  '../reducer/loginReducer'
 import { credentialsToId } from '../common/credetails'
+import { toLogin } from '../utils/https'
 import type { Dispatch, CreatorState, CredentialsT,LoginState } from '../common/constants'
 
 type Props = LoginState & {
@@ -20,7 +21,7 @@ class LoginCreator extends React.Component<Props> {
       dispatch
     } = this.props
     
-    console.log(this.props)  
+   
     const listItems = savedCreds.map((cred) => (
       <li
         className="saved-credentials"
@@ -57,12 +58,11 @@ class LoginCreator extends React.Component<Props> {
             <div className="connection-error">
               <p>{error}</p>
             </div>
-          )}
+          )}l
           <Login
             credential ={credential}
             disabled={false}
             onSubmit={(creds, remember) => {
-              console.log(creds);
               dispatch(toLogin(creds, remember))
             }}
             onChange={(name, value) => {
@@ -81,8 +81,6 @@ class LoginCreator extends React.Component<Props> {
 }
 
 export default connect((state) => {
-  console.log('1231');
-  console.log(state.loginModule);
   return Object.assign({}, state.loginModule, { savedCreds: state.loginModule.credentials })
 }
 )(LoginCreator)
@@ -120,8 +118,6 @@ class Login extends React.Component<LoginProps, LoginState> {
 
   handleChange(event) {
     const { name, value } = event.target
-    console.log(name);
-    console.log(value);
     this.props.onChange(name, value)
   }
 
@@ -135,9 +131,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     const { realName, mobile, password, server, port } = this.props.credential
     const { rememberCredentials,serverClass,useDefaultConfig } = this.state
     const inputGroupClass = 'input-group'
-    console.log('001');
-    console.log(disabled);
-    console.log(this.props.credential);
+    
     return (
       <form
         className="login-form"

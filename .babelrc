@@ -8,5 +8,8 @@
       }
     }]
   ],
-  "plugins": ["transform-node-env-inline"]
+  "plugins": [
+    "transform-node-env-inline",
+    "@babel/plugin-proposal-class-properties"
+  ]
 }

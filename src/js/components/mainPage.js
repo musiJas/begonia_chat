@@ -2,10 +2,17 @@
 import React from 'react'
 import classNames from 'classnames'
 import  MainRouter from './mainRouter'
-
 import  * as type  from  '../common/actionTypes'
-
 import { connect } from 'react-redux'
+import mqtt from "mqtt";
+import config from '../utils/propUtil'
+
+import  MessageState  from '../common/constants'
+
+import {listMessage} from '../utils/https'
+
+
+
 type Props = {
   connections: Array<ConnectionT>,
   route: RouteT,
@@ -15,9 +22,185 @@ type Props = {
 }
 
 class mainPage extends React.Component<props> {
+    constructor(props) {
+      super(props);
+      this.state = {
+          client: null,
+          connectStatus: "Connect",
+          connected:false,
+          messages: [],
+          topic:'' 
+      };
+  }
+
+  onchangeState=(bool)=>{
+      this.setState({
+          connected:bool
+      })
+  }
+
+  initialMQTT=()=>{
+    console.log('initialMQTT');
+    console.log(config);
+    this.handleConnect(config.url,config.options);
+  }
+
+  handleConnect=(host, mqttOptions)=>{
+    console.log('handleConnect');
+    this.setState({ 
+      connectStatus: "Connecting"
+      // client:this.client
+    });
+    console.log('init....');
+    console.log(host);
+    console.log(mqttOptions);
+    const client = mqtt.connect(host, mqttOptions);
+    console.log(client);  
+    // this.setState({
+    //     client:client,
+    //     messages:[
+    //       {"topic":"1",message:"4:0123123123"},
+    //       {"topic":"1",message:"4:111111111"},
+    //       {"topic":"1",message:"4:222222222"}]
+    // })
+
+    this.props.dispatch({   
+      type:type.RECEIVERMESSAGE_INFO,
+      receiveMessages:[
+              {"topic":"1",message:"4:0123123123"},
+              {"topic":"1",message:"4:111111111"},
+              {"topic":"1",message:"4:222222222"}]
+    })
+
+    //messages:['4:123123123',"4:123123123"]
+    if (client) {
+        client.on("connect", () => {
+            this.setState({ connectStatus: "Connected" });
+        });
+        client.on("error", (err) => {
+            console.error("Connection error: ", err);
+            this.client.end();
+        });
+        client.on("reconnect", () => {
+            this.setState({ connectStatus: "Reconnecting" });
+        });
+        client.on("message", (topic, message) => {
+            console.log('message is receive:');
+            console.log(message);
+            const payload = { topic, message: message.toString() };
+            const { messages } = this.state;
+            if (payload.topic) {
+                const changedMessages = messages.concat([payload]);
+                // this.setState({ messages: changedMessages }); 
+                // console.log('123123111');
+                this.props.dispatch({  
+                  type:type.RECEIVERMESSAGE_INFO,
+                  messages:this.setState.messages
+                })
+            }
+        });
+    }
+    };
+
+
+    handleDisconnect=()=>{
+      console.log('handleDisconnect');
+      const client=this.state.client;
+      console.log(client); 
+      if (client) {
+          client.end(() => {
+              this.setState({ connectStatus: "Connect" });
+              this.setState({ client: null });
+          });
+      }
+    };
+
+
+
+      
+    
+    handleSubscribe=(topic, qos)=>{
+      console.log(topic);
+      console.log(qos);
+      console.log('handleSubscribe');
+      console.log(this.state.client);  
+      const client=this.state.client; 
+      if (client) {
+          client.subscribe(topic, { qos }, (error) => {
+              if (error) {
+                  console.log("Subscribe to topics error", error);
+                  return;
+              }
+              this.setState({ isSubed: true, topic:topic}); 
+          });
+      }
+  };
+
+
+  
+    handleUnsub=(topic)=>{
+        console.log('handleUnsub');
+        const client=this.state.client;
+        console.log(client); 
+        if (client) {
+            client.unsubscribe(topic, (error) => {
+                if (error) {
+                    console.log("Unsubscribe error", error);
+                    return;
+                }
+                this.setState({ isSubed: false });
+            });
+        }
+    };
+    
+    handlePublish=(pubRecord)=>{
+        console.log('handlePublish');
+        const client=this.state.client;
+        console.log(client);  
+        if (client) {
+            const { topic, qos, payload } = pubRecord;
+            client.publish(topic, payload, { qos }, (error) => {
+                if (error) {
+                    console.log("Publish error: ", error);
+                }
+            });
+        }
+    };
+    
+
+  //   componentWillUnmount(){
+  //     this.handleDisconnect();
+  //     this.setState = (state, callback) => {
+  //         return;
+  //     }
+  // }
+
+
+    componentDidMount(){
+      console.log(this.props);
+      console.log(this.state);
+      //此处还要初始化自己的发送的消息
+      var requestMsg={
+        to:this.props.credential.mobile
+      }
+      let result=listMessage(requestMsg).then((result)=>{
+        console.log("json:"+JSON.stringify(result));
+        this.props.dispatch({   
+          type:type.HISTORYMESSAGE_INFO,
+          historyMessages:result.obj
+        })
+      });
+      //第一次初始化执行连接
+      if(!this.state.connected){
+        this.initialMQTT();//连接MQTT
+        this.onchangeState(true);
+      }
+        
+    }
+
   render() {
     const { route, connections, children, dispatch } = this.props
-    console.log(children);
+   
     return (
       <React.Fragment>
         <div className="connection-tabs">
@@ -26,8 +209,10 @@ class mainPage extends React.Component<props> {
 
             </Pic>
 
-            <Tab 
-               onClick={(props) => {
+            <Tab credential={route.credential}  connected={this.state.connected} onchangeState={this.onchangeState}
+                connect={this.initialMQTT}
+                disconnect={this.handleDisconnect}
+                onClick={(props) => {
                   dispatch(props)
                 }}
             >
@@ -53,7 +238,11 @@ class mainPage extends React.Component<props> {
         </div>
         <div className="connection-view">
               {/* 窗口主体 */}
-              <MainRouter />
+              <MainRouter 
+                subscribe={this.handleSubscribe}
+                unsubscribe={this.handleUnsub}
+                publisher={this.handlePublish}
+                state={this.state}/>
         </div>
       </React.Fragment>
     )
@@ -128,8 +317,16 @@ const Tab = (props) => (
             className={classNames('tab', { selected: props.selected || false })}
             className="icon-btn"
             onClick={(e) => {
+              console.log("111");
+              console.log(props);
+              //判断是否需要进行重新连接
+              if(!props.connected){
+                props.connect();//连接MQTT
+                props.onchangeState(true);
+              }
               props.onClick({
-                type:type.MESSAGE_ONLINE
+                type:type.MESSAGE_ONLINE,
+                credential:props.credential
               })
             e.stopPropagation()
             //dispatch({ type: 'REDIRECT', route: { view: 'SETTINGS' } })
@@ -140,10 +337,14 @@ const Tab = (props) => (
         <button
             className="icon-btn"
             onClick={(e) => {
+              if(props.connected){
+                props.disconnect();
+                props.onchangeState(false);
+              }
               props.onClick({
                 type:type.USERMANAGER_ONLINE
               })
-            e.stopPropagation()
+            e.stopPropagation() 
         }}
         >
           <UserIcon color="#AAABAE" />
@@ -165,7 +366,8 @@ const GearIcon = (props) => (
   </svg>
 )
 
-export default connect((state: LoginState, ownProps): $Shape<Props> => {
+export default connect((state:MessageState, ownProps): $Shape<Props> => {
+  console.log(state);
   return {
     route: state.loginModule
   }

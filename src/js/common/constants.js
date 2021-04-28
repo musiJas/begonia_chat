@@ -89,6 +89,27 @@ export type CredentialsT = {
   password: string
 }
 
+export type chatMessage={
+  topic:string,
+  content:string,
+  receiveGmt:string,
+  from:string,
+  to:string
+}
+
+
+export type  requestMsg = {
+  reqId:string,
+  groupId:string,
+  msg:string,
+  to:string,
+  from:string,
+  gmtTime:string
+}
+
+
+
+
 export type CreatorState = {
   isConnecting: boolean,
   credentials: CredentialsT,
@@ -113,7 +134,9 @@ export  type  MessageState={
   userName:string,
   mobile:string,
   to:string,
-  showScroll:Boolean
+  showScroll:Boolean,
+  msg:string,
+  messages:Array<chatMessage>
 }
 
 export  type SettingState={

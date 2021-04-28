@@ -17,14 +17,15 @@ type props={
 
 class  MainRouterComponent extends React.PureComponent<props>{
     renderContents() {
-        console.log(this.props);
         const { mainRouter } = this.props
+        console.log(this.props);
         //route.type
-        console.log("mainRouter");
-        console.log(mainRouter);
         switch (mainRouter.type) { 
             case 'MESSAGE_ONLINE':
-                return <MessageOnline />
+                return <MessageOnline state={this.props.state} 
+                        subscribe={this.props.subscribe}
+                        unsub={this.props.unsubscribe}
+                        publisher={this.props.publisher}/>
             case 'USERMANAGER_ONLINE':
                 return <UserManagerOnline  />
             case 'SETTINGMANAGER_INFO':

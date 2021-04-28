@@ -4,6 +4,7 @@ import  React  from 'react'
 import { connect } from 'react-redux' 
 import * as types from '../../common/actionTypes'
 import {UsersState} from '../../common/constants'
+import { getUsers } from '../../utils/https'
 
 type props={
     route: RouteT,
@@ -12,35 +13,54 @@ type props={
 
 
 class UserLeftPanel extends React.Component<props>{
+    
     constructor(props) {
         super(props)
         this.state = {
             showScroll: false,
-            index:'1'
+            index:'1',
+            users:[]
         }
-}
+    }
+
+    componentDidMount(){
+        this.loadUsers();
+    }
+
 
     
-    funCheck(index,to){
-        console.log(this.props);
-
+    funCheck(index,item){
         this.setState({
             index:index,
-            to:to
+            item:item
         })
+       
         this.props.dispatch({
                 type:types.USERSMANAGER_INFO,
-                to:to
+                item:item
             }
         )
     }  
 
+    loadUsers(){
+        getUsers(this.props.route.mobile).then((res)=>{
+            this.setState({
+                users:res.obj
+            })
+        });  
+    }
+
+
 
     render (){
-        const  showScroll=this.state.showScroll;
+        const  showScroll=this.state.showScroll; 
+        // console.log(this.props);
+        // console.log(this.state);
         return (
             <div className="main_leftPanel_div" >
-                <div className="main_leftPanel_search"> search</div>   
+                <div className="main_leftPanel_search">
+                    <SearchPanel></SearchPanel>    
+                </div>   
                 <ul className={`main_leftPanel_ul  ${showScroll?"show_scroll":''}`}    
                     onMouseEnter={(e)=>{
                             this.setState({
@@ -54,127 +74,17 @@ class UserLeftPanel extends React.Component<props>{
                         })
                     }}
                     >
-                    <li index={'1'} onClick={this.funCheck.bind(this,'1',"3")}  className={`main_leftPanel_li  ${this.state.index =='1'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'2'} onClick={this.funCheck.bind(this,'2',"3")} className={`main_leftPanel_li  ${this.state.index =='2'?"main_left_li":''} `} >user测试2</li>
-                    <li index={'3'} onClick={this.funCheck.bind(this,'3',"3")} className={`main_leftPanel_li  ${this.state.index =='3'?"main_left_li":''} `} >user测试3</li>
-                    <li index={'4'} onClick={this.funCheck.bind(this,'4',"3")} className={`main_leftPanel_li  ${this.state.index =='4'?"main_left_li":''} `} >user测试4</li>
-                    <li index={'5'} onClick={this.funCheck.bind(this,'5',"3")} className={`main_leftPanel_li  ${this.state.index =='5'?"main_left_li":''} `} >user测试5</li>
-                    <li index={'6'} className={`main_leftPanel_li  ${this.state.index =='6'?"main_left_li":''} `} >user测试6</li>
-                    <li index={'7'} className={`main_leftPanel_li  ${this.state.index =='7'?"main_left_li":''} `} >user测试7</li>
-                    <li index={'8'} className={`main_leftPanel_li  ${this.state.index =='8'?"main_left_li":''} `} >user测试8</li>
-                    <li index={'9'} className={`main_leftPanel_li  ${this.state.index =='9'?"main_left_li":''} `} >user测试9</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >user测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
-                    <li index={'10'} className={`main_leftPanel_li  ${this.state.index =='10'?"main_left_li":''} `} >测试1</li>
-                    <li index={'11'} className={`main_leftPanel_li  ${this.state.index =='11'?"main_left_li":''} `} >测试1</li>
-                    <li index={'12'} className={`main_leftPanel_li  ${this.state.index =='12'?"main_left_li":''} `} >测试1</li>
-                    <li index={'13'} className={`main_leftPanel_li  ${this.state.index =='13'?"main_left_li":''} `} >测试1</li>
-                    <li index={'14'} className={`main_leftPanel_li  ${this.state.index =='14'?"main_left_li":''} `} >测试1</li>
-                    <li index={'15'} className={`main_leftPanel_li  ${this.state.index =='15'?"main_left_li":''} `} >测试1</li>
-                    <li index={'16'} className={`main_leftPanel_li  ${this.state.index =='16'?"main_left_li":''} `} >测试1</li>
-                    <li index={'17'} className={`main_leftPanel_li  ${this.state.index =='17'?"main_left_li":''} `} >测试1</li>
-                    <li index={'18'} className={`main_leftPanel_li  ${this.state.index =='18'?"main_left_li":''} `} >测试1</li>
-                    <li index={'19'} className={`main_leftPanel_li  ${this.state.index =='19'?"main_left_li":''} `} >测试1</li>
-                    <li index={'20'} className={`main_leftPanel_li  ${this.state.index =='20'?"main_left_li":''} `} >测试1</li>
-                    <li index={'21'} className={`main_leftPanel_li  ${this.state.index =='21'?"main_left_li":''} `} >测试1</li>
-                    <li index={'22'} className={`main_leftPanel_li  ${this.state.index =='22'?"main_left_li":''} `} >测试1</li>
-                    <li index={'23'} className={`main_leftPanel_li  ${this.state.index =='23'?"main_left_li":''} `} >测试1</li>
+                    {  this.state.users.map((item,index)=>{
+                        return <li key={index} index={index} onClick={this.funCheck.bind(this,index,item)}  className={`main_leftPanel_li  ${this.state.index ==index?"main_left_li":''} `} >
+                                <div>
+                                    <div className='user_newLeftIcon'><img className='user-lefticon' src="http://www.begonia.com/demo/file/static/cherry.png"></img> </div>
+                                    <div className='user_newRightSpan'>
+                                        <div> {item.userName}</div>
+                                    </div>
+                                </div>
+                            </li> 
+                    })} 
+                    
                 </ul>
             </div>
         )
@@ -183,8 +93,19 @@ class UserLeftPanel extends React.Component<props>{
 }
 
 
+const  SearchPanel=(props)=>(
+    <React.Fragment>
+        <div className='user_searchdiv'>
+            <input className='user_search' placeholder='搜索'></input>
+        </div>
+        <div className='user_searchbtn'>
+            <button className='user_searchRightBtn'>+</button>
+        </div>
+    </React.Fragment>
+)
+
 export default connect((state: UserState, ownProps): $Shape<Props> => {
     return {
-      route: state.userModule
+        route: state.userModule
     }
-  })(UserLeftPanel)
+})(UserLeftPanel)

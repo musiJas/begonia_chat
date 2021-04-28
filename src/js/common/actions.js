@@ -36,3 +36,13 @@ export  const  loginFailed = (text) =>({
   isLogin:false,
   error:text
 })
+
+export const sendSuccess= (date)=>({
+  type:types.SENDMESSAGE_SUCCESS,
+  data:date,
+})
+
+export const sendFail= (msg)=>({
+  type:types.SENDMESSAGE_FAILED,
+  msg:msg
+})

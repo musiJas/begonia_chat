@@ -28,21 +28,24 @@ class  RouteComponent extends React.PureComponent<props>{
     
     //route.type
     let  credential={
-      realName: "test",
-      mobile: "13508687083",
-      server: "https://www.begonia.com",
-      port: "880",
-      password: "3"
+      realName: "1号",
+      mobile: "1",
+      server: "http://www.begonia.com",
+      port: "80",
+      password: "1"
     }
     this.props.dispatch({
       type:type.MESSAGE_ONLINE,
       credential:credential,
       isLogin:true,
-
     })
-    switch ('LOGIN_SCCUESS') { 
+    
+    sessionStorage.setItem("server", credential.server);
+    sessionStorage.setItem("port", credential.port);
+    //route.type
+    switch ('LOGIN_SCCUESS') {  
       case 'LOGIN_SCCUESS':
-        return <MainPage />
+        return <MainPage credential={credential}/>
       case 'LOGIN_TODO':
         return <LoginCreator  />
       default:

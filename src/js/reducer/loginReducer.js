@@ -27,6 +27,7 @@ export function  init():LoginState{
 }
 
 function loginState(state: LoginState = init(), action: Action): LoginState {
+    console.log(action);
     switch (action.type) { 
       case actionTypes.LOGIN_SCCUESS: { 
         return Object.assign({}, state, {
