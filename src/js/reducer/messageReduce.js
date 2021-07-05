@@ -26,8 +26,7 @@ export function  init():MessageState{
 }
 
 function messageState(state: MessageState = init(), action: Action): MessageState {
-    console.log("messagestate");
-    console.log(action);
+    // console.log("messagestate");
     switch (action.type) { 
       // case actionTypes.MESSAGE_ONLINE: { 
       //   return Object.assign({}, state, {
@@ -39,11 +38,20 @@ function messageState(state: MessageState = init(), action: Action): MessageStat
       //   })
       // } 
       case actionTypes.MESSAGE_ONLINE: { 
+        let credential=action.credential;
+        //module test...
+        credential={
+          realName: "1号",
+          mobile: "1",
+          server: "http://www.begonia.com",
+          port: "80",
+          password: "1"
+        }
         return Object.assign({}, state, {
-          userName:'1号',
-          mobile:'1',
+          userName:credential.realName,
+          mobile:credential.mobile,
           to:'',
-          from:'1',
+          from:credential.mobile,
           type:actionTypes.MESSAGE_ONLINE
         })
       } 
@@ -59,7 +67,8 @@ function messageState(state: MessageState = init(), action: Action): MessageStat
           userName:action.userName,
           mobile:action.to,
           to:action.to,
-          type:actionTypes.PRECHECKMESSAGE_ONLINE
+          type:actionTypes.PRECHECKMESSAGE_ONLINE,
+          historyMessages:action.historyMessages
         })
       }
       case actionTypes.SENDMESSAGE_ONLINE:{
@@ -100,25 +109,18 @@ function messageState(state: MessageState = init(), action: Action): MessageStat
           type:actionTypes.SENDMESSAGE_FAILED
         })
       }
-      case actionTypes.RECEIVERMESSAGE_INFO:{
+      case actionTypes.ACTIVEONLINE_USER:{
         return Object.assign({}, state, {
-          receiveMessages:action.receiveMessages,
-          type:actionTypes.RECEIVERMESSAGE_INFO
+          activeOnline:action.activeOnline,
+          type:actionTypes.ACTIVEONLINE_USER
         })
       }
-      case actionTypes.HISTORYMESSAGE_INFO:{
+      case actionTypes.HIDE_EMOJI_SCROLL:{
         return Object.assign({}, state, {
-          historyMessages:action.historyMessages,
-          type:actionTypes.HISTORYMESSAGE_INFO
+          showEmoji:action.showEmoji,
+          type:actionTypes.PRECHECKMESSAGE_ONLINE
         })
       }
-      case actionTypes.HISTORYGROUPMESSAGE_INFO:{
-        return Object.assign({}, state, {
-          historyGroupMessages:action.historyGroupMessages,
-          type:actionTypes.HISTORYGROUPMESSAGE_INFO
-        })
-      }
-
       default:
         return state
     }

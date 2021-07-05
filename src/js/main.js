@@ -14,6 +14,7 @@ const inProduction = process.env.NODE_ENV === 'dev'
 
 const  mainDiv=document.getElementById("main");
 const initialState = {};
+const {dialog,ipcMain,ipcRenderer} = require('electron').remote
 
 // , notifMiddleware, storeChannelsMiddleware
 const middleware = [thunkMiddleware]
@@ -34,6 +35,9 @@ const store: ReduxStore = createStore(
   let state=store.getState();
   console.log("initial state->");
   console.log(state);
+  console.log(dialog);
+  console.log(ipcMain);
+
 //返回监听的数据
 const  unSubSciption=store.subscribe(()=>{
   console.log(store.getState())
@@ -45,6 +49,8 @@ const  unSubSciption=store.subscribe(()=>{
 //         conn.stream.quit(state.settings.quitMessage)
 //     })
 //   })
+
+
 
 if(mainDiv){
     render(

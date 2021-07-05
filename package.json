@@ -14,7 +14,8 @@
     "flow": "glow",
     "build": "sh ./bin/build",
     "pack": "electron-packager . wechat --win --out ../target --arch=x64 --app-version=0.0.1 --electron-version=2.0.0",
-    "browse": "electron-packager . wechat --win --out ../browse --arch=x64 --app-version=0.0.1 --electron-version=2.0.0"
+    "browse": "electron-packager . wechat --win --out ../browse --arch=x64 --app-version=0.0.1 --electron-version=2.0.0",
+    "package:win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --out=out --icon=assets/app-icon/win/app.ico"
   },
   "author": "begonia.chen",
   "license": "ISC",
@@ -31,7 +32,10 @@
     "sass": "^1.32.8",
     "slate-irc": "0.9.0",
     "uuid": "8.3.0",
-    "mqtt": "^4.2.1"
+    "mqtt": "^4.2.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "redux-logger": "3.0.6"
   },
   "devDependencies": {
     "@babel/cli": "7.10.5",

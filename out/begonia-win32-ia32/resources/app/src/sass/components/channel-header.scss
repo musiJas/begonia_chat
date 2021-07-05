@@ -1,0 +1,53 @@
+.channel-header {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+}
+
+.channel-header .channel-name {
+  display: inline-block;
+  font-size: 1.2rem;
+  letter-spacing: 0.6px;
+  font-weight: bold;
+  color: #383c4a;
+}
+
+.channel-header .channel-people-count {
+  font-size: 0.8rem;
+  letter-spacing: 0.4px;
+  color: #7c818c;
+}
+
+.channel-header .icon-btn {
+  border: none;
+  background: none;
+  outline: none;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.icon-btn{
+  cursor: pointer;
+}
+
+
+.channel-header .conversation-dropdown {
+  position: absolute;
+  top: calc(100% - 12px);
+  right: 12px;
+  z-index: 1;
+}
+.channel-header .conversation-dropdown li {
+  cursor: default;
+}
+.channel-header .conversation-dropdown input[type='checkbox'] {
+  margin-right: 8px;
+}
+.channel-header .conversation-dropdown label {
+  display: flex;
+  align-items: center;
+  line-height: 2;
+}

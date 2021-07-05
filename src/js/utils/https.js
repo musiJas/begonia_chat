@@ -30,7 +30,7 @@ export const  toLogin =(
         }
         sessionStorage.setItem("server", server);
         sessionStorage.setItem("port", port);
-        const  res=httpClient.post(requestJoinUpUrl("/login"),user).then(function(res){ 
+        const  res=httpClient.post(requestJoinUpUrl("/login"),user).then(function(res){
             dispatch(res.code==200?loginSccuess(res.obj):loginFailed(res.msg));
         }); 
     }
@@ -44,7 +44,6 @@ export const  getUsers=(mobile)=>{
 
 // 获取用户
 export const  onLineUser=(mobile)=>{
-    console.log(mobile); 
     let res=httpClient.post(requestJoinUpUrl("/onLineUser"),{mobile});
     return res;
 }
@@ -52,18 +51,25 @@ export const  onLineUser=(mobile)=>{
 
 
 export  const sendMsg=(requestMsg)=>{
-    console.log(requestMsg); 
     let res=httpClient.post(requestJoinUpUrl("/sendMsg"),requestMsg);
     return res;
 }
 
 export const listMessage=(requestMsg)=>{
-    console.log(requestMsg);
     let res=httpClient.post(requestJoinUpUrl("/list/messages"),requestMsg);
     return res;
 }
 
+export const emojiList=()=>{
+    let res=httpClient.post(requestJoinUpUrl("/emoji/list"),{});
+    return res;
+}
 
+
+export const postFile=(requestMsg)=>{
+    let res=httpClient.postFile(requestJoinUpUrl("/sendFileMsg"),requestMsg);
+    return res;
+}
 
 // // 获取send message 
 // export const  sendMsg=(

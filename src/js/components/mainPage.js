@@ -6,10 +6,12 @@ import  * as type  from  '../common/actionTypes'
 import { connect } from 'react-redux'
 import mqtt from "mqtt";
 import config from '../utils/propUtil'
+import ReceiveState   from '../common/constants'
+import { types } from '@babel/core'
 
-import  MessageState  from '../common/constants'
+const ipc = require('electron').ipcRenderer
 
-import {listMessage} from '../utils/https'
+
 
 
 
@@ -29,7 +31,9 @@ class mainPage extends React.Component<props> {
           connectStatus: "Connect",
           connected:false,
           messages: [],
-          topic:'' 
+          topic:'',
+          receiveMessages:[],
+          initialTray:false
       };
   }
 
@@ -40,22 +44,19 @@ class mainPage extends React.Component<props> {
   }
 
   initialMQTT=()=>{
-    console.log('initialMQTT');
-    console.log(config);
+    //console.log('initialMQTT');
+    //console.log(config);
     this.handleConnect(config.url,config.options);
   }
 
   handleConnect=(host, mqttOptions)=>{
-    console.log('handleConnect');
+    //console.log('handleConnect');
     this.setState({ 
       connectStatus: "Connecting"
-      // client:this.client
     });
-    console.log('init....');
-    console.log(host);
-    console.log(mqttOptions);
-    const client = mqtt.connect(host, mqttOptions);
-    console.log(client);  
+    //console.log('init....');
+    this.client = mqtt.connect(host, mqttOptions);
+    //console.log(this.client);  
     // this.setState({
     //     client:client,
     //     messages:[
@@ -63,39 +64,48 @@ class mainPage extends React.Component<props> {
     //       {"topic":"1",message:"4:111111111"},
     //       {"topic":"1",message:"4:222222222"}]
     // })
-
-    this.props.dispatch({   
-      type:type.RECEIVERMESSAGE_INFO,
-      receiveMessages:[
-              {"topic":"1",message:"4:0123123123"},
-              {"topic":"1",message:"4:111111111"},
-              {"topic":"1",message:"4:222222222"}]
-    })
+    // this.props.dispatch({   
+    //   type:type.RECEIVERMESSAGE_INFO,
+    //   receiveMessages:[
+    //           {"topic":"1",message:"4:0123123123"},
+    //           {"topic":"1",message:"4:111111111"},
+    //           {"topic":"1",message:"4:222222222"}]
+    // })
 
     //messages:['4:123123123',"4:123123123"]
-    if (client) {
-        client.on("connect", () => {
+    if (this.client) {
+        this.client.on("connect", () => {
+            //console.log("connect");
             this.setState({ connectStatus: "Connected" });
         });
-        client.on("error", (err) => {
-            console.error("Connection error: ", err);
+        this.client.on("error", (err) => {
+            //console.error("Connection error: ", err);
             this.client.end();
         });
-        client.on("reconnect", () => {
+        this.client.on("reconnect", () => {
             this.setState({ connectStatus: "Reconnecting" });
         });
-        client.on("message", (topic, message) => {
-            console.log('message is receive:');
-            console.log(message);
-            const payload = { topic, message: message.toString() };
+        this.client.on("message", (topic, message) => {
+            //console.log('message is receive:');
+            //console.log(message);
+            //重新转换一下数据 
+            let content=message.toString();
+            const payload = { 
+              topic, 
+              msg:content.split(":")[1],
+              from:content.split(":")[0],
+              to:topic,
+              gmtTime:new Date().getTime().toString()  
+            };
             const { messages } = this.state;
             if (payload.topic) {
                 const changedMessages = messages.concat([payload]);
-                // this.setState({ messages: changedMessages }); 
+                //this.setState({ receiveMessages: changedMessages }); 
                 // console.log('123123111');
+                //console.log(changedMessages);
                 this.props.dispatch({  
                   type:type.RECEIVERMESSAGE_INFO,
-                  messages:this.setState.messages
+                  receiveMessages:changedMessages
                 })
             }
         });
@@ -104,11 +114,11 @@ class mainPage extends React.Component<props> {
 
 
     handleDisconnect=()=>{
-      console.log('handleDisconnect');
-      const client=this.state.client;
-      console.log(client); 
-      if (client) {
-          client.end(() => {
+      //console.log('handleDisconnect');
+      // const client=this.state.client;
+      // console.log(client); 
+      if (this.client) {
+          this.client.end(() => {
               this.setState({ connectStatus: "Connect" });
               this.setState({ client: null });
           });
@@ -120,15 +130,15 @@ class mainPage extends React.Component<props> {
       
     
     handleSubscribe=(topic, qos)=>{
-      console.log(topic);
-      console.log(qos);
-      console.log('handleSubscribe');
-      console.log(this.state.client);  
-      const client=this.state.client; 
-      if (client) {
-          client.subscribe(topic, { qos }, (error) => {
+      // console.log(topic);
+      // console.log(qos);
+      // console.log('handleSubscribe');
+      // console.log(this.client);  
+     // const client=this.state.client; 
+      if (this.client) {
+          this.client.subscribe(topic, { qos }, (error) => {
               if (error) {
-                  console.log("Subscribe to topics error", error);
+                  //console.log("Subscribe to topics error", error);
                   return;
               }
               this.setState({ isSubed: true, topic:topic}); 
@@ -139,13 +149,13 @@ class mainPage extends React.Component<props> {
 
   
     handleUnsub=(topic)=>{
-        console.log('handleUnsub');
-        const client=this.state.client;
-        console.log(client); 
-        if (client) {
-            client.unsubscribe(topic, (error) => {
+        //console.log('handleUnsub');
+        //const client=this.state.client;
+        //console.log(this.client); 
+        if (this.client) {
+            this.client.unsubscribe(topic, (error) => {
                 if (error) {
-                    console.log("Unsubscribe error", error);
+                    //console.log("Unsubscribe error", error);
                     return;
                 }
                 this.setState({ isSubed: false });
@@ -154,12 +164,12 @@ class mainPage extends React.Component<props> {
     };
     
     handlePublish=(pubRecord)=>{
-        console.log('handlePublish');
-        const client=this.state.client;
-        console.log(client);  
-        if (client) {
+        // console.log('handlePublish');
+        // const client=this.state.client;
+        // console.log(this.client);  
+        if (this.client) {
             const { topic, qos, payload } = pubRecord;
-            client.publish(topic, payload, { qos }, (error) => {
+            this.client.publish(topic, payload, { qos }, (error) => {
                 if (error) {
                     console.log("Publish error: ", error);
                 }
@@ -176,31 +186,79 @@ class mainPage extends React.Component<props> {
   // }
 
 
-    componentDidMount(){
-      console.log(this.props);
-      console.log(this.state);
-      //此处还要初始化自己的发送的消息
-      var requestMsg={
-        to:this.props.credential.mobile
-      }
-      let result=listMessage(requestMsg).then((result)=>{
-        console.log("json:"+JSON.stringify(result));
-        this.props.dispatch({   
-          type:type.HISTORYMESSAGE_INFO,
-          historyMessages:result.obj
+    initialMenuTray=(bool)=>{
+        ipc.send('put-in-tray');
+        let that=this;
+        ipc.on('tray-removed', function () {
+          //此处回退到登录状态
+            that.props.dispatch({  
+              type:type.LOGIN_FAILED
+            })
+          //trayOn = false
+          //document.getElementById('tray-countdown').innerHTML = ''
+          ipc.send('remove-tray')
         })
-      });
+        ipc.on('tray-info',function(){
+            //show  info window //TODO...
+        })
+    }
+
+    // initialMenuTray = (props)=>{
+    //   //初始化托盘小图标
+    //   //let trayOn = false
+    //   //if (trayOn) {
+    //   //  trayOn = false
+    //   //  document.getElementById('tray-countdown').innerHTML = ''
+    //   //  ipc.send('remove-tray')
+    //   //} else {
+    //   //  trayOn = true
+    //     //const message = 'begonia.';
+    //     //document.getElementById('tray-countdown').innerHTML = message
+    //     ipc.send('put-in-tray');
+    //   //}
+    //   console.log(props);
+
+    //   // 从图标上下文菜单中删除托盘
+    //   ipc.on('tray-removed', function () {
+    //     console.log(this.props);
+    //     //此处回退到登录状态
+    //     this.props.dispatch({  
+    //       type:type.LOGIN_TODO
+    //     })
+        
+    //     //trayOn = false
+    //     //document.getElementById('tray-countdown').innerHTML = ''
+    //     ipc.send('remove-tray')
+    //   })
+
+    //   ipc.on('tray-info',function(){
+    //       //show  info window //TODO...
+    //   })
+
+    // }
+
+    componentDidMount(){
+      // console.log(this.props);
+      // console.log(this.state);
+    
       //第一次初始化执行连接
       if(!this.state.connected){
         this.initialMQTT();//连接MQTT
         this.onchangeState(true);
       }
-        
+      if(!this.state.isSubed){
+        this.handleSubscribe(this.props.credential.mobile,0);
+      }
+
+      //初始化小图标
+      if(!this.state.initialTray){
+        this.initialMenuTray();
+      }
+
     }
 
   render() {
     const { route, connections, children, dispatch } = this.props
-   
     return (
       <React.Fragment>
         <div className="connection-tabs">
@@ -209,7 +267,9 @@ class mainPage extends React.Component<props> {
 
             </Pic>
 
-            <Tab credential={route.credential}  connected={this.state.connected} onchangeState={this.onchangeState}
+            <Tab credential={route.credential}  connected={this.state.connected} isSubed={this.state.isSubed}
+                subscribe={this.handleSubscribe}
+                onchangeState={this.onchangeState}
                 connect={this.initialMQTT}
                 disconnect={this.handleDisconnect}
                 onClick={(props) => {
@@ -241,8 +301,9 @@ class mainPage extends React.Component<props> {
               <MainRouter 
                 subscribe={this.handleSubscribe}
                 unsubscribe={this.handleUnsub}
-                publisher={this.handlePublish}
-                state={this.state}/>
+                // publisher={this.handlePublish}
+                state={this.state}
+                />
         </div>
       </React.Fragment>
     )
@@ -317,12 +378,16 @@ const Tab = (props) => (
             className={classNames('tab', { selected: props.selected || false })}
             className="icon-btn"
             onClick={(e) => {
-              console.log("111");
-              console.log(props);
+              //console.log("111");
+              //console.log(props);
               //判断是否需要进行重新连接
               if(!props.connected){
                 props.connect();//连接MQTT
                 props.onchangeState(true);
+              }
+
+              if(!props.isSubed){
+                props.subscribe(props.credential.mobile,0);
               }
               props.onClick({
                 type:type.MESSAGE_ONLINE,
@@ -366,8 +431,7 @@ const GearIcon = (props) => (
   </svg>
 )
 
-export default connect((state:MessageState, ownProps): $Shape<Props> => {
-  console.log(state);
+export default connect((state:ReceiveState, ownProps): $Shape<Props> => {
   return {
     route: state.loginModule
   }

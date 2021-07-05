@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>测试title</title>
+    <style>
+      body {
+        font-family: system, -apple-system, '.SFNSText-Regular', 'SF UI Text', 'Lucida Grande', 'Segoe UI', Ubuntu, Cantarell, sans-serif;
+        color: #9e9e9e;
+        background-color: #fffffff4;
+        /* text-align: center;
+        font-size: 40px; */
+        margin: 0px;
+        overflow: hidden;
+      }
+      
+      h2 {
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      
+      #close {
+        color: white;
+        opacity: 0.7;
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        text-decoration: none;
+      }
+      
+       /* 拖动防止选中文本 */
+      .titlebar { 
+        -webkit-user-select: none;
+        -webkit-app-region: drag;
+      }
+
+      .header_div{
+        text-align: left;
+        font-size: 14px;
+      }
+      .header_left{
+        width: 70%;
+        display: inline-block;
+        margin-left: 8px;
+        margin-top: 5px;
+        -webkit-app-region: drag;
+      }
+      .header_min{
+        float: right;
+        width: 35px;
+        height: 25px;
+        text-align: center;
+        font-size: 17px;
+        cursor: pointer;
+      }
+      .header_max {
+        float: right;
+        width: 35px;
+        height: 25px;
+        text-align: center;
+        font-size: 17px;
+        cursor: pointer;
+      }
+ 
+      .header_max:hover{
+        background-color: #ff0000c4;
+        color: white;
+      }
+      .header_min:hover{
+        background-color: #9e9e9e30;
+        color: #0000007a;
+      } 
+
+      /* search input  */
+        .search_input input[type='text']{
+            display: inline-block;
+            width: 410px;
+            border-radius: 5px;
+            height: 23px;
+            text-indent: 30px;
+            border: 0px solid #ccc;
+            line-height: 20px;
+            font-size: 12px;
+            outline: none;
+            background-color: rgba(204, 204, 204, 0.47);
+        }
+        .search_input input[type='text']:focus{
+            border: 1px solid #ccc;
+            text-indent: 30px;
+            border-radius: 5px;
+            /*border-color: white;*/
+            background-color: white;
+        }
+        .search_input {
+            /* margin-top: 10px;
+            text-align: center;
+            margin-top: 300px; */
+            text-align: center;
+            height: 50px;
+            line-height: 50px;
+        }
+        .search_input i{
+            position: relative;
+            left: 30px;
+            color: rgba(102, 102, 102, 0.47);
+            font-size: 13px;
+        }
+
+        .fa {
+            display: inline-block;
+            font: normal normal normal 14px/1 FontAwesome;
+            font-size: inherit;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .fa-search:before {
+            content: "\f002";
+        }
+        .header_li{
+          font-size: 16px;
+          margin-right: 25px;
+          cursor: pointer;
+          color: black;
+        }
+        .header_tabs{
+          text-align: center;
+          height: 30px;
+          line-height: 30px;
+        }
+        .tabs_check{
+          border-bottom: 1px solid #029b02ed;
+          padding-bottom: 5px;
+          color: #029b02ed;
+        }
+        .separater_hr{
+          height: 1px;
+          background-color: #9e9e9e1c;
+          border: none;
+          margin-top: 15px;
+        }
+        .separater_content_hr{
+          height: 1px;
+          background-color: #9e9e9e1c;
+          border: none;
+          margin-top: 15px;
+          width: 80%;
+        }
+        .content_div_left{
+          
+        }
+        .content_div_right{
+          display: inline-block;
+          width: 80%;
+          /* width: 70%;
+          height: 45px;
+          line-height: 45px; */
+        }
+        .content_div_left_img{
+          width: 45px;
+          height: 45px;
+          margin-left: 15px;
+        }
+        .content_div_span{
+          font-size: 13px;
+        }
+        .content_div_date{
+          float: right;
+        }
+        .content_div{
+          margin-top: 5px;
+          color: black;
+        }
+        
+          /*滚动条样式*/
+        .show_scroll::-webkit-scrollbar {/*滚动条整体样式*/
+            width: 7px;     /*高宽分别对应横竖滚动条的尺寸*/
+
+        }
+        .show_scroll::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+            border-radius: 25px;
+            -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
+            /* height: 10px; */
+        }
+        .show_scroll::-webkit-scrollbar-track {/*滚动条里面轨道*/
+            -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            background: rgba(0,0,0,0);
+        }
+        .show_scroll{
+            overflow-y: auto !important;
+        }
+        
+    /* search input end  */
+      </style>
+      <script type="text/javascript">
+            const ipc = require('electron').ipcRenderer
+            const BrowserWindow = require('electron').remote.BrowserWindow
+            let fromWindowId;
+            let fromWindow;
+            ipc.on('initial-complete', function (event, json, fromWindowId) {
+              const result ='';
+              fromWindowId=fromWindowId;
+              fromWindow = BrowserWindow.fromId(fromWindowId);
+              //window.close()
+              console.log('123');
+              console.log()
+              var height=window.innerHeight-130;
+              document.getElementsByClassName('content')[0].setAttribute('style','max-height:'+height+'px');
+            })
+        
+            ipc.on('content-resized',function(event,fromWindowId){
+              var height=window.innerHeight-130;  
+              document.getElementsByClassName('content')[0].setAttribute('style','max-height:'+height+'px');
+            })
+
+
+            function adapterMin(){
+              fromWindow.webContents.send('minimize');
+            }
+
+            function checkFocus(obj){
+              var lis=document.getElementsByClassName('header_li');
+              for(var li of lis){
+                li.classList.remove('tabs_check')
+              }
+
+              obj.classList.add('tabs_check')
+            }
+
+            function hoverContent(obj){
+              obj.classList.add('show_scroll');
+            }
+
+            function mouseLeaver(obj){
+              obj.classList.remove('show_scroll');
+            }
+
+      </script>
+      
+  </head>
+  <body>
+    <div>
+      <div className="header">
+          <div class="header_div">
+            <span class="header_left">文件传输助手</span>
+            <span class="header_max" onmouseenter="javascript:console.log('')" onclick="javascript:window.close()">×</span>
+            <span class="header_min" onclick="adapterMin()">–</span>
+          </div>
+          <div class="search_input">
+            <i class="fa fa-search" id="i-advanced-search-i"></i>
+            <input type="text" id="i-advanced-search"   placeholder="搜索">
+          </div>
+          <div class="header_tabs">
+              <span class="header_li tabs_check" onclick="checkFocus(this)" val='all'>全部</span>
+              <span class="header_li" onclick="checkFocus(this)" val='file'>文件</span>
+              <span class="header_li" onclick="checkFocus(this)" val='pic'>图片与视频</span>
+              <span class="header_li" onclick="checkFocus(this)" val='link'>链接</span>
+          </div>
+      </div>
+      <hr class="separater_hr"/>
+      <div class="content " onmouseenter="hoverContent(this);" onmouseleave="mouseLeaver(this);" >
+              <div class="content_div_left">
+                  <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+                  <div class="content_div_right">
+                    <div class="content_div_span">
+                      <span>begonia.chen</span>
+                      <span class="content_div_date">21/10/31</span>
+                    </div>
+                    <div class="content_div">
+                      <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                    </div>
+                  </div>
+                  <hr class="separater_content_hr"/>
+              </div>
+              <div class="content_div_left">
+                <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+                <div class="content_div_right">
+                  <div class="content_div_span">
+                    <span>begonia.chen</span>
+                    <span class="content_div_date">21/10/31</span>
+                  </div>
+                  <div class="content_div">
+                    <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                  </div>
+                </div>
+                <hr class="separater_content_hr"/>
+            </div>
+            <div class="content_div_left">
+              <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+              <div class="content_div_right">
+                <div class="content_div_span">
+                  <span>begonia.chen</span>
+                  <span class="content_div_date">21/10/31</span>
+                </div>
+                <div class="content_div">
+                  <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                </div>
+              </div>
+              <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+          <div class="content_div_left">
+            <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+            <div class="content_div_right">
+              <div class="content_div_span">
+                <span>begonia.chen</span>
+                <span class="content_div_date">21/10/31</span>
+              </div>
+              <div class="content_div">
+                <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+              </div>
+            </div>
+            <hr class="separater_content_hr"/>
+          </div>
+            <div class="content_div_left">
+              <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+              <div class="content_div_right">
+                <div class="content_div_span">
+                  <span>begonia.chen</span>
+                  <span class="content_div_date">21/10/31</span>
+                </div>
+                <div class="content_div">
+                  <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                </div>
+              </div>
+              <hr class="separater_content_hr"/>
+            </div>
+            <div class="content_div_left">
+              <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+              <div class="content_div_right">
+                <div class="content_div_span">
+                  <span>begonia.chen</span>
+                  <span class="content_div_date">21/10/31</span>
+                </div>
+                <div class="content_div">
+                  <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                </div>
+              </div>
+              <hr class="separater_content_hr"/>
+            </div>
+            <div class="content_div_left">
+              <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+              <div class="content_div_right">
+                <div class="content_div_span">
+                  <span>begonia.chen</span>
+                  <span class="content_div_date">21/10/31</span>
+                </div>
+                <div class="content_div">
+                  <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                </div>
+              </div>
+              <hr class="separater_content_hr"/>
+            </div>
+            <div class="content_div_left">
+              <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+              <div class="content_div_right">
+                <div class="content_div_span">
+                  <span>begonia.chen</span>
+                  <span class="content_div_date">21/10/31</span>
+                </div>
+                <div class="content_div">
+                  <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                </div>
+              </div>
+              <hr class="separater_content_hr"/>
+            </div>
+            <div class="content_div_left">
+              <img class="content_div_left_img" align="top" src="http://www.begonia.com/demo/file/static/cherry.png" />
+              <div class="content_div_right">
+                <div class="content_div_span">
+                  <span>begonia.chen</span>
+                  <span class="content_div_date">21/10/31</span>
+                </div>
+                <div class="content_div">
+                  <span>测试信息11111111111111111111111111111111测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1测试信息1</span>
+                </div>
+              </div>
+              <hr class="separater_content_hr"/>
+            </div>
+      </div>
+
+    </div>
+
+    <!-- <h2 style="-webkit-app-region: drag" >你好!</h2> -->
+    <!-- <a id="close" style="-webkit-app-region: no-drag" href="javascript:window.close()">关闭此窗体</a> -->
+  </body>
+</html>
+

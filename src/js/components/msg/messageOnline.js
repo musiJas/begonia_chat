@@ -1,5 +1,6 @@
 import React, { createContext }  from 'react'
 import { connect } from 'react-redux' 
+import * as types from '../../common/actionTypes'
 import MessageLeftPanel  from './messageLeftPanel'
 import MessageMiddlePanel  from './messageMiddlePanel'
 import MessageRightPanel  from './messageRightPanel'
@@ -36,26 +37,26 @@ class MessageOnlinePage extends    React.Component<props>{
             connectStatus: "Connect",
             isSubed: false,
             messages: [],
-            topic:'' 
+            topic:''
+        
         };
     }
 
 
-  
-
-  
     
     render() {
-        console.log('>>>>>>>>>>>>>>>>>>>>>>>111111');
-        console.log(this.state);
-        console.log(this.props);
-        console.log(this);
-        
         // this.setState({
         //     client:this.props.state.client
         // })
         return (
-            <div className="container">
+            <div className="container" 
+                onClick={()=>{
+                    this.props.dispatch({
+                        type:types.HIDE_EMOJI_SCROLL,
+                        showEmoji:false
+                    })
+                }}
+                >
                 <div className="left-panel main_leftPanel">
                     <MessageLeftPanel  
                         subscribe={this.props.subscribe}
@@ -65,7 +66,9 @@ class MessageOnlinePage extends    React.Component<props>{
                 <div className="right-panel">
                     <MessageRightPanel 
                         publisher={this.publisher}
-                        state={this.props.state}/>
+                        state={this.props.state}
+                        receiveMessages={this.props.receiveMessages}
+                        />
                 </div>
             </div>
         )
@@ -76,8 +79,8 @@ class MessageOnlinePage extends    React.Component<props>{
 
 
 export default connect((state: MessageState, ownProps): $Shape<Props> => {
-    console.log(state); 
     return {
-      route: state.messageModule
+        route: state.messageModule,
+        receiveMessages:state.receiverModule.receiveMessages
     }
   })(MessageOnlinePage)

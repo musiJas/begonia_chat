@@ -1,0 +1,41 @@
+.connection-tabs {
+  height: 100vh;
+  width: 60px;
+  background: #252525;
+  float: left;
+
+  .tab {
+    margin: 1px 8px 0;
+    background: #373d48;
+    border-radius: 6px;
+    color: #7c818c;
+  }
+
+  .tab.selected {
+    width: 50px;
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    color: #fff;
+  }
+
+  .tab.tab-settings-link {
+    position: absolute;
+    bottom: 8px;
+    opacity: 0.5;
+    transition: opacity 180ms ease-out;
+  }
+  .tab.tab-settings-link:hover {
+    opacity: 1;
+  }
+
+  .tab button {
+    outline: none;
+    border: none;
+    background: none;
+    width: 40px;
+    height: 40px;
+    color: inherit;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,31 @@
+.people-list {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 220px;
+  background-color: #fff;
+  border-left: 1px solid #eee;
+}
+
+.people-list .scrolling-panel {
+  padding: 0.8rem;
+  height: calc(100% - 4rem);
+}
+
+.people-list .nickname {
+  display: block;
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.people-search-field {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  line-height: 1.8;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid #cccfd6;
+  background: none;
+}

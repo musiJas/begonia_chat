@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>测试title</title>
+    <style>
+      
+    
+      </style>
+      <script type="text/javascript">
+            const ipc = require('electron').ipcRenderer
+            const BrowserWindow = require('electron').remote.BrowserWindow
+            let fromWindowId;
+            let fromWindow;
+            ipc.on('initial-complete', function (event, json, fromWindowId) {
+              const result ='';
+              fromWindowId=fromWindowId;
+              fromWindow = BrowserWindow.fromId(fromWindowId);
+              //window.close()
+              console.log('123');
+              console.log()
+              
+            })
+        
+            ipc.on('content-resized',function(event,fromWindowId){
+              var height=window.innerHeight-130;  
+              document.getElementsByClassName('content')[0].setAttribute('style','max-height:'+height+'px');
+            })
+
+
+            function adapterMin(){
+              fromWindow.webContents.send('minimize');
+            }
+
+            function checkFocus(obj){
+              var lis=document.getElementsByClassName('header_li');
+              for(var li of lis){
+                li.classList.remove('tabs_check')
+              }
+
+              obj.classList.add('tabs_check')
+            }
+
+            function hoverContent(obj){
+              obj.classList.add('show_scroll');
+            }
+
+            function mouseLeaver(obj){
+              obj.classList.remove('show_scroll');
+            }
+
+      </script>
+      
+  </head>
+  <body>
+    <div>
+      
+
+    </div>
+
+    <!-- <h2 style="-webkit-app-region: drag" >你好!</h2> -->
+    <!-- <a id="close" style="-webkit-app-region: no-drag" href="javascript:window.close()">关闭此窗体</a> -->
+  </body>
+</html>
+
